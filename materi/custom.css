@@ -1,0 +1,20 @@
+/* Mengatur font utama agar lebih modern */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+}
+
+/* Mempercantik warna judul */
+h1, h2, h3 {
+    color: #1e3a8a; /* Warna biru dongker profesional */
+    font-weight: 600;
+}
+
+/* Membuat kotak konten atau output terlihat lebih rapi dengan efek bayangan tipis */
+div.cell, .jp-Cell {
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    background: #ffffff;
+    padding: 10px;
+    margin-bottom: 15px;
+}

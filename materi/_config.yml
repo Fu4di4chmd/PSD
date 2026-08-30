@@ -1,0 +1,27 @@
+# Book settings
+# Learn more at https://jupyterbook.org/customize/config.html
+
+title: Analisis Kualitas Udara Labang
+author: Achmad Saiful Fuadi
+logo: logo.png
+
+# Force re-execution of notebooks on each build.
+execute:
+  execute_notebooks: force
+
+# Pengaturan Tema Tampilan Web Modern (Bukan seperti PDF)
+html:
+  use_issues_button: true
+  use_repository_button: true
+  use_fullscreen_button: true
+  home_page_in_navbar: true
+  extra_navbar: |
+    <p>Proyek Sains Data - UTM</p>
+  css:
+    - custom.css
+
+# Informasi Repository GitHub Anda (Opsional, sesuaikan nanti)
+repository:
+  url: https://github.com/username-anda/nama-repo  # Ganti dengan link github Anda nanti
+  path_to_book: materi
+  branch: main
