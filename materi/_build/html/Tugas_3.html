@@ -565,13 +565,36 @@ document.write(`
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="c1"># --- 1. PERHITUNGAN IQR &amp; DETEKSI OUTLIER ---</span>
+<span class="c1"># (Pastikan df_co dan kolom 'CO_imputed' sudah ada dari sel sebelumnya)</span>
+
+<span class="c1"># Menghitung Kuartil 1 (Q1) dan Kuartil 3 (Q3)</span>
+<span class="n">Q1</span> <span class="o">=</span> <span class="n">df_co</span><span class="p">[</span><span class="s2">"CO_imputed"</span><span class="p">]</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="mf">0.25</span><span class="p">)</span>
+<span class="n">Q3</span> <span class="o">=</span> <span class="n">df_co</span><span class="p">[</span><span class="s2">"CO_imputed"</span><span class="p">]</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="mf">0.75</span><span class="p">)</span>
+
+<span class="c1"># Menghitung rentang interkuartil (IQR)</span>
+<span class="n">IQR</span> <span class="o">=</span> <span class="n">Q3</span> <span class="o">-</span> <span class="n">Q1</span>
+
+<span class="c1"># Menentukan Batas Bawah dan Batas Atas (Sesuai rumus di Bab 2)</span>
+<span class="n">batas_bawah</span> <span class="o">=</span> <span class="n">Q1</span> <span class="o">-</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="n">IQR</span>
+<span class="n">batas_atas</span> <span class="o">=</span> <span class="n">Q3</span> <span class="o">+</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="n">IQR</span>
+
+<span class="c1"># Memisahkan data yang teridentifikasi sebagai outlier untuk ditandai di grafik</span>
+<span class="n">outliers</span> <span class="o">=</span> <span class="n">df_co</span><span class="p">[(</span><span class="n">df_co</span><span class="p">[</span><span class="s2">"CO_imputed"</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">batas_bawah</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">df_co</span><span class="p">[</span><span class="s2">"CO_imputed"</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">batas_atas</span><span class="p">)]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Batas Bawah: </span><span class="si">{</span><span class="n">batas_bawah</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Batas Atas: </span><span class="si">{</span><span class="n">batas_atas</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Jumlah Outlier terdeteksi: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">outliers</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 
-<span class="c1"># 1. Menyiapkan Canvas untuk 2 Subplot (Boxplot &amp; Time Series)</span>
+<span class="c1"># --- 2. VISUALISASI ---</span>
+<span class="c1"># Menyiapkan Canvas untuk 2 Subplot (Boxplot &amp; Time Series)</span>
 <span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
 
-<span class="c1"># --- Subplot 1: Boxplot (Kiri) ---</span>
-<span class="c1"># Tambahkan sedikit warna (patch_artist) agar tidak terlalu polos</span>
+<span class="c1"># Subplot 1: Boxplot (Kiri)</span>
 <span class="n">ax1</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">df_co</span><span class="p">[</span><span class="s2">"CO_imputed"</span><span class="p">],</span> <span class="n">vert</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">patch_artist</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">boxprops</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">facecolor</span><span class="o">=</span><span class="s1">'lightblue'</span><span class="p">))</span>
 <span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Boxplot Deteksi Outlier CO Labang"</span><span class="p">)</span>
 <span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Konsentrasi CO"</span><span class="p">)</span>
@@ -579,7 +602,7 @@ document.write(`
 <span class="n">ax1</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">batas_bawah</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"blue"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Batas Bawah (Lower Bound)"</span><span class="p">)</span>
 <span class="n">ax1</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 
-<span class="c1"># --- Subplot 2: Time Series dengan Titik Outlier (Kanan) ---</span>
+<span class="c1"># Subplot 2: Time Series dengan Titik Outlier (Kanan)</span>
 <span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">df_co</span><span class="p">[</span><span class="s2">"date"</span><span class="p">],</span> <span class="n">df_co</span><span class="p">[</span><span class="s2">"CO_imputed"</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Data CO (Imputed)"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"gray"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
 
 <span class="c1"># Memberi tanda titik merah tebal pada nilai yang teridentifikasi sebagai outlier</span>
@@ -605,7 +628,12 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/bdeceb6da31f8810b3e9ced3590aad4f899915e48a9eca63eaf43834d76b8bec.png" src="_images/bdeceb6da31f8810b3e9ced3590aad4f899915e48a9eca63eaf43834d76b8bec.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Batas Bawah: 0.020405300925
+Batas Atas: 0.03714660779166667
+Jumlah Outlier terdeteksi: 6
+</pre></div>
+</div>
+<img alt="_images/16051be19cba94de923d17947d409d11f43d91aaacf5fbffd0f20263b4c7c6c7.png" src="_images/16051be19cba94de923d17947d409d11f43d91aaacf5fbffd0f20263b4c7c6c7.png" />
 </div>
 </div>
 <div class="cell docutils container">
@@ -750,9 +778,9 @@ Requirement already satisfied: ptyprocess&gt;=0.5 in /usr/local/lib/python3.13/d
 Requirement already satisfied: wcwidth&gt;=0.1.4 in /usr/local/lib/python3.13/dist-packages (from prompt-toolkit!=3.0.0,!=3.0.1,&lt;3.1.0,&gt;=2.0.0-&gt;ipython&gt;=7.4.0-&gt;tsfel) (0.8.3)
 Requirement already satisfied: six&gt;=1.5 in /usr/local/lib/python3.13/dist-packages (from python-dateutil&gt;=2.8.2-&gt;pandas&gt;=1.5.3-&gt;tsfel) (1.17.0)
 Downloading tsfel-0.2.0-py3-none-any.whl (63 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ <span class=" -Color -Color-Green">63.4/63.4 kB</span> <span class=" -Color -Color-Red">2.3 MB/s</span> eta <span class=" -Color -Color-Cyan">0:00:00</span>
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ <span class=" -Color -Color-Green">63.4/63.4 kB</span> <span class=" -Color -Color-Red">6.7 MB/s</span> eta <span class=" -Color -Color-Cyan">0:00:00</span>
 ?25hDownloading jedi-0.20.0-py2.py3-none-any.whl (4.9 MB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ <span class=" -Color -Color-Green">4.9/4.9 MB</span> <span class=" -Color -Color-Red">55.1 MB/s</span> eta <span class=" -Color -Color-Cyan">0:00:00</span>
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ <span class=" -Color -Color-Green">4.9/4.9 MB</span> <span class=" -Color -Color-Red">116.9 MB/s</span> eta <span class=" -Color -Color-Cyan">0:00:00</span>
 ?25hInstalling collected packages: jedi, tsfel
 Successfully installed jedi-0.20.0 tsfel-0.2.0
 </pre></div>
@@ -837,7 +865,7 @@ Successfully installed jedi-0.20.0 tsfel-0.2.0
 </pre></div>
 </div>
 <div class="output text_html">
-  <div id="df-7e8e64a1-fae2-4ac1-9104-787cf8ba107c" class="colab-df-container">
+  <div id="df-e00389fd-c2ef-4df7-9554-5776bb32fb5e" class="colab-df-container">
     <div>
 <style scoped>
     .dataframe tbody tr th:only-of-type {
@@ -917,7 +945,7 @@ Successfully installed jedi-0.20.0 tsfel-0.2.0
     <div class="colab-df-buttons">
 
   <div class="colab-df-container">
-    <button class="colab-df-convert" onclick="convertToInteractive('df-7e8e64a1-fae2-4ac1-9104-787cf8ba107c')"
+    <button class="colab-df-convert" onclick="convertToInteractive('df-e00389fd-c2ef-4df7-9554-5776bb32fb5e')"
             title="Convert this dataframe to an interactive table."
             style="display:none;">
 
@@ -969,12 +997,12 @@ Successfully installed jedi-0.20.0 tsfel-0.2.0
 
     <script>
       const buttonEl =
-        document.querySelector('#df-7e8e64a1-fae2-4ac1-9104-787cf8ba107c button.colab-df-convert');
+        document.querySelector('#df-e00389fd-c2ef-4df7-9554-5776bb32fb5e button.colab-df-convert');
       buttonEl.style.display =
         google.colab.kernel.accessAllowed ? 'block' : 'none';
 
       async function convertToInteractive(key) {
-        const element = document.querySelector('#df-7e8e64a1-fae2-4ac1-9104-787cf8ba107c');
+        const element = document.querySelector('#df-e00389fd-c2ef-4df7-9554-5776bb32fb5e');
         const dataTable =
           await google.colab.kernel.invokeFunction('convertToInteractive',
                                                     [key], {});
@@ -997,7 +1025,7 @@ Successfully installed jedi-0.20.0 tsfel-0.2.0
     </div>
   </div>
 </div><div class="output text_html">
-  <div id="df-8553ed8a-fc79-4292-830b-ab98980a54bb" class="colab-df-container">
+  <div id="df-ad5b83ac-b905-48c3-aaeb-6c3f6d6a8593" class="colab-df-container">
     <div>
 <style scoped>
     .dataframe tbody tr th:only-of-type {
@@ -1052,7 +1080,7 @@ Successfully installed jedi-0.20.0 tsfel-0.2.0
     <div class="colab-df-buttons">
 
   <div class="colab-df-container">
-    <button class="colab-df-convert" onclick="convertToInteractive('df-8553ed8a-fc79-4292-830b-ab98980a54bb')"
+    <button class="colab-df-convert" onclick="convertToInteractive('df-ad5b83ac-b905-48c3-aaeb-6c3f6d6a8593')"
             title="Convert this dataframe to an interactive table."
             style="display:none;">
 
@@ -1104,12 +1132,12 @@ Successfully installed jedi-0.20.0 tsfel-0.2.0
 
     <script>
       const buttonEl =
-        document.querySelector('#df-8553ed8a-fc79-4292-830b-ab98980a54bb button.colab-df-convert');
+        document.querySelector('#df-ad5b83ac-b905-48c3-aaeb-6c3f6d6a8593 button.colab-df-convert');
       buttonEl.style.display =
         google.colab.kernel.accessAllowed ? 'block' : 'none';
 
       async function convertToInteractive(key) {
-        const element = document.querySelector('#df-8553ed8a-fc79-4292-830b-ab98980a54bb');
+        const element = document.querySelector('#df-ad5b83ac-b905-48c3-aaeb-6c3f6d6a8593');
         const dataTable =
           await google.colab.kernel.invokeFunction('convertToInteractive',
                                                     [key], {});
