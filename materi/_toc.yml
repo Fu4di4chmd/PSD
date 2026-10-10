@@ -1,10 +1,13 @@
-# Table of contents
-# Learn more at https://jupyterbook.org/customize/toc.html
+
+# Table of Contents
+# Proyek Sains Data - UTM
 
 format: jb-book
 root: intro
+
 chapters:
-- file: Tugas_1
-- file: Tugas_2
-- file: Tugas_3
-- file: Tugas_4
+  - file: Tugas_1
+  - file: Tugas_2
+  - file: Tugas_3
+  - file: Tugas_4
+  - file: UTS_Klasifikasi_Tutupan_Lahan

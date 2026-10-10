@@ -1,15 +1,18 @@
-# Book settings
-# Learn more at https://jupyterbook.org/customize/config.html
+
+# ==================================================
+# KONFIGURASI JUPYTER BOOK
+# PROYEK SAINS DATA - UTM
+# ==================================================
 
 title: Analisis Kualitas Udara Labang
 author: Achmad Saiful Fuadi
 logo: logo.jpg
 
-# Force re-execution of notebooks on each build.
+# Pengaturan eksekusi notebook
 execute:
-  execute_notebooks: force
+  execute_notebooks: off
 
-# Pengaturan Tema Tampilan Web Modern (Bukan seperti PDF)
+# Pengaturan tampilan website
 html:
   use_issues_button: true
   use_repository_button: true
@@ -20,8 +23,14 @@ html:
   css:
     - custom.css
 
-# Informasi Repository GitHub Anda (Opsional, sesuaikan nanti)
+# Informasi repository GitHub
 repository:
-  url: https://github.com/username-anda/nama-repo  # Ganti dengan link github Anda nanti
+  url: https://github.com/username-anda/nama-repo
   path_to_book: materi
   branch: main
+
+# Pastikan file peta HTML dan citra ikut build
+sphinx:
+  config:
+    html_extra_path:
+      - uts_assets
