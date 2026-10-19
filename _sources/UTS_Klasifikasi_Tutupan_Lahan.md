@@ -1,11 +1,14 @@
 # Pemetaan dan Klasifikasi Tutupan Lahan Jawa Timur Menggunakan Citra Sentinel-2 dan Random Forest
 
-**Laporan Proyek Pengganti Ujian Tengah Semester — Pengolahan Data Spasial**  
-**Penyusun:** Achmad Saiful Fuadi  
-**Wilayah kajian:** Provinsi Jawa Timur, termasuk Madura, pada cakupan raster komposit Sentinel-2 yang tersedia  
+**Laporan Proyek Pengganti Ujian Tengah Semester — Pengolahan Data Spasial**
+
+**Penyusun:** Achmad Saiful Fuadi
+
+**Wilayah kajian:** Provinsi Jawa Timur, termasuk Madura, pada cakupan raster komposit Sentinel-2 yang tersedia
+
 **Teknologi:** Google Earth Engine (GEE), Copernicus Browser, Python, GeoPandas, Rasterio, Scikit-learn, Folium/Leaflet, Streamlit, dan Jupyter Book
 
-> **Status laporan:** diperbarui mengikuti model Random Forest *sampling Forest per poligon* yang digunakan pada website akhir. Metrik menunjukkan performa pada data uji berlabel, **bukan** validasi akurasi setiap lokasi di Jawa Timur.
+> **Status laporan:** diperbarui mengikuti model Random Forest **sampling Forest per poligon** yang digunakan pada website akhir. Metrik menunjukkan performa pada data uji berlabel, **bukan** validasi akurasi setiap lokasi di Jawa Timur.
 
 ---
 
@@ -46,10 +49,15 @@ Bagaimana mengekstraksi fitur dari citra Sentinel-2 menggunakan poligon berlabel
 ### 1.3 Tujuan
 
 1. Menyiapkan 328 poligon GeoJSON pada lima kelas.
+
 2. Mengolah 10 band spektral dan 4 indeks dari Sentinel-2.
+
 3. Memisahkan training/testing berdasarkan ID poligon.
+
 4. Melatih, menguji, dan membandingkan strategi sampling Random Forest.
+
 5. Menghasilkan raster klasifikasi dan peta interaktif dengan layer terpisah.
+
 6. Menyajikan hasil pada Streamlit dan laporan Jupyter Book.
 
 ### 1.4 Ruang Lingkup dan Batasan
@@ -64,9 +72,11 @@ Pemetaan dilakukan pada **piksel valid dalam cakupan raster komposit Jawa Timur*
 
 Dua jalur data Sentinel-2 digunakan dengan fungsi berbeda:
 
-- **Copernicus Browser:** citra Sentinel-2 Level-2A tanggal **1 Oktober 2026** untuk pengamatan dan referensi visual/digitasi.
-- **Google Earth Engine (GEE):** komposit Sentinel-2 Surface Reflectance Harmonized dari **1 Januari sampai sebelum 1 Oktober 2026**, disiapkan menjadi 14 band dan diekspor pada skala **100 meter** untuk ekstraksi sampel dan prediksi wilayah kajian.
-- **GeoJSON:** 328 poligon berlabel hasil digitasi; koordinat diselaraskan dengan CRS raster saat pengolahan.
+\- **Copernicus Browser:** citra Sentinel-2 Level-2A tanggal **1 Oktober 2026** untuk pengamatan dan referensi visual/digitasi.
+
+\- **Google Earth Engine (GEE):** komposit Sentinel-2 Surface Reflectance Harmonized dari **1 Januari sampai sebelum 1 Oktober 2026**, disiapkan menjadi 14 band dan diekspor pada skala **100 meter** untuk ekstraksi sampel dan prediksi wilayah kajian.
+
+\- **GeoJSON:** 328 poligon berlabel hasil digitasi; koordinat diselaraskan dengan CRS raster saat pengolahan.
 
 Raster utama prediksi `sentinel2_jatim_14fitur_100m.tif` berdimensi **5.933 × 4.124 piksel**, **EPSG:32749**, resolusi **100 × 100 meter**. Raster `sentinel2_jatim_training_buffer3km_14fitur_100m.tif` digunakan untuk menjangkau sampel training di sekitar pesisir yang kurang tercakup oleh raster administrasi tanpa buffer. File asli Copernicus dan komposit GEE berbeda tujuan dan tidak boleh disamakan resolusinya.
 
@@ -106,8 +116,9 @@ Tahap `scripts/02_preprocessing.py` mencocokkan CRS/geometri poligon dengan rast
 
 Output utama:
 
-- `outputs/reports/training.csv`
-- `outputs/reports/testing.csv`
+\- `outputs/reports/training.csv`
+
+\- `outputs/reports/testing.csv`
 
 Setiap baris data berisi 14 nilai fitur, `polygon_id`, dan `label`.
 
@@ -129,7 +140,7 @@ Pemisahan berdasarkan poligon mengurangi kebocoran data antar piksel dalam satu 
 
 ### 4.1 Algoritma dan Parameter
 
-Random Forest menggabungkan keputusan banyak pohon (*ensemble*) untuk memprediksi kelas tutupan lahan berdasarkan 14 fitur spektral.
+Random Forest menggabungkan keputusan banyak pohon (**ensemble**) untuk memprediksi kelas tutupan lahan berdasarkan 14 fitur spektral.
 
 | Parameter | Nilai |
 |---|---|
@@ -162,16 +173,27 @@ Pada `03_training_rf.py`, sampling Forest awal dilakukan acak dari kumpulan selu
 Pola inti pelatihan:
 
 ```python
+
 rf_model = RandomForestClassifier(
-    n_estimators=200,
-    max_features="sqrt",
-    min_samples_leaf=1,
-    random_state=42,
-    class_weight="balanced",
-    n_jobs=-1,
+
+      n_estimators=200,
+
+      max_features="sqrt",
+
+      min_samples_leaf=1,
+
+      random_state=42,
+
+      class_weight="balanced",
+
+      n_jobs=-1,
+
 )
+
 rf_model.fit(X_train, y_train)
+
 y_pred = rf_model.predict(X_test)
+
 ```
 
 Model eksperimen disimpan pada `outputs/models/random_forest_model_sampling_poligon.joblib`, sedangkan laporan eksperimen disimpan di `outputs/reports/eksperimen_sampling_poligon/`. Model utama sebelum eksperimen tidak ditimpa.
@@ -230,7 +252,7 @@ Empat fitur dengan importance tertinggi pada model eksperimen:
 | NDVI | 0,104143 |
 | B11 | 0,101197 |
 
-Nilai *impurity-based importance* ini menunjukkan kontribusi relatif fitur menurut model, bukan bukti sebab-akibat atau akurasi geografis untuk satu kelas tertentu.
+Nilai **impurity-based importance** ini menunjukkan kontribusi relatif fitur menurut model, bukan bukti sebab-akibat atau akurasi geografis untuk satu kelas tertentu.
 
 ### 5.5 Grafik Evaluasi
 
@@ -264,12 +286,14 @@ File `scripts/10_peta_interaktif_rf.py` mereproyeksikan raster ke EPSG:4326, men
 #### Peta model eksperimen (HTML)
 
 ```{raw} html
-<iframe src="uts_assets/peta_interaktif_rf_sampling_poligon.html" width="100%" height="700" style="border:1px solid #d3d9df; border-radius:8px;" title="Peta interaktif klasifikasi Random Forest Jawa Timur"></iframe>
+
+<iframe src="peta_interaktif_rf_sampling_poligon.html" width="100%" height="700" style="border:1px solid #d3d9df; border-radius:8px;" title="Peta interaktif klasifikasi Random Forest Jawa Timur"></iframe>
+
 ```
 
-> **Berkas wajib sebelum build Jupyter Book:** salin `outputs/maps/peta_interaktif_rf_sampling_poligon.html` dari repository UTS ke `materi/uts_assets/peta_interaktif_rf_sampling_poligon.html` pada repository PSD. Jika tidak disalin, iframe akan kosong/404. File HTML tersebut perlu diterbitkan bersama hasil build GitHub Pages.
+> **Berkas wajib sebelum build Jupyter Book:** salin `outputs/maps/peta_interaktif_rf_sampling_poligon.html` dari repository UTS ke `materi/uts_assets/peta_interaktif_rf_sampling_poligon.html` pada repository PSD. Saat build, Jupyter Book menyalin HTML peta ke `_build/html/peta_interaktif_rf_sampling_poligon.html`. Karena itu, `iframe` dan tautan halaman penuh memakai lokasi tersebut yang relatif terhadap halaman laporan.
 
-**[Buka peta interaktif di halaman penuh](uts_assets/peta_interaktif_rf_sampling_poligon.html)**
+**[Buka peta interaktif di halaman penuh](peta_interaktif_rf_sampling_poligon.html)**
 
 ### 6.3 Pemeriksaan Kewajaran Geografis
 
@@ -291,19 +315,26 @@ Aplikasi Streamlit menggunakan `app.py` dan menyediakan **delapan halaman**: Ber
 
 **Repository kode UTS:** [Fu4di4chmd/UTS-Klasifikasi-Tutupan-Lahan](https://github.com/Fu4di4chmd/UTS-Klasifikasi-Tutupan-Lahan)
 
-**Website Streamlit:** tambahkan URL `.streamlit.app` milik proyek setelah memastikan alamat pastinya. Tidak perlu menuliskan alamat perkiraan yang belum diverifikasi.
+**Website Streamlit:** [Buka aplikasi klasifikasi Jawa Timur](https://uts-klasifikasi-jatim.streamlit.app/).
 
 ### 7.3 Urutan Script Reproduksi
 
 Jika **raster sumber lokal** dan dependensi sudah tersedia:
 
 ```powershell
+
 py -3.9 scripts/01_data_understanding.py
+
 py -3.9 scripts/02_preprocessing.py
+
 py -3.9 scripts/03_training_rf_uji_sampling_poligon.py
+
 py -3.9 scripts/14_prediksi_sampling_poligon.py
+
 py -3.9 scripts/10_peta_interaktif_rf.py
+
 py -3.9 -m streamlit run app.py
+
 ```
 
 Script `04_evaluation.py` dan `05_create_map.py` merupakan bagian alur awal; evaluasi akhir tersedia di folder laporan eksperimen. Raster besar dari GEE tidak disertakan di repository GitHub biasa, sehingga proses dari nol memerlukan data lokal tersebut.
