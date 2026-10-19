@@ -293,7 +293,9 @@ File `scripts/10_peta_interaktif_rf.py` mereproyeksikan raster ke EPSG:4326, men
 
 > **Berkas wajib sebelum build Jupyter Book:** salin `outputs/maps/peta_interaktif_rf_sampling_poligon.html` dari repository UTS ke `materi/uts_assets/peta_interaktif_rf_sampling_poligon.html` pada repository PSD. Saat build, Jupyter Book menyalin HTML peta ke `_build/html/peta_interaktif_rf_sampling_poligon.html`. Karena itu, `iframe` dan tautan halaman penuh memakai lokasi tersebut yang relatif terhadap halaman laporan.
 
-**[Buka peta interaktif di halaman penuh](peta_interaktif_rf_sampling_poligon.html)**
+**<a href="peta_interaktif_rf_sampling_poligon.html" target="_blank">
+  Buka peta interaktif di halaman penuh
+</a>**
 
 ### 6.3 Pemeriksaan Kewajaran Geografis
 
